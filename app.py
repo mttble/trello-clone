@@ -5,6 +5,8 @@ from flask_marshmallow import Marshmallow
 
 app = Flask(__name__)
 
+# app.config['JSON_SORT_KEYS'] = False
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:matt@localhost:5432/trello'
 
 db = SQLAlchemy(app)
@@ -20,7 +22,8 @@ class Card(db.Model):
 
 class CardSchema(ma.Schema):
     class Meta:
-        fields = ('id', 'title', 'description', 'status', 'date_created')
+        fields = ('id', 'title', 'description', 'status')
+        
 
 @app.cli.command('create')
 def create_db():
@@ -67,7 +70,7 @@ def all_cards():
     #(db.or_(Card.status != 'Done', Card.id > 2)) - or function card status is not Done or card ID greater than 2
     stmt = db.select(Card).order_by(Card.status.desc())
     cards = db.session.scalars(stmt).all()
-    return CardSchema().dumps(cards)
+    return CardSchema(many=True).dumps(cards)
     # for card in cards:
     #     print(card.__dict__)
 
