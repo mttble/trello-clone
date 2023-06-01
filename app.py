@@ -13,6 +13,7 @@ class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100))
     description = db.Column(db.Text())
+    status = db.Column(db.String(30))
     date_created = db.Column(db.Date())
 
 @app.cli.command('create')
@@ -24,20 +25,45 @@ def create_db():
 @app.cli.command('seed')
 def seed_db():
     # Create an instance of the Card model in memory
-    card = Card(
-        title = 'Start the project',
-        description = 'Stage 1 - Create ERD',
-        date_created = date.today()
+    cards = [
+        Card(
+            title = 'Start the project',
+            description = 'Stage 1 - Create ERD',
+            status = 'Done',
+            date_created = date.today()
+    ),
+        Card(
+            title = 'ORM Queries',
+            description = 'Stage 2 - Implement several queries',
+            status = 'In Progress',
+            date_created = date.today()
+    ),
+        Card(
+            title = 'Marshmallow',
+            description = 'Stage 3 - Implement jsonify of models',
+            status = 'In Progress',
+            date_created = date.today()
     )
-# Truncate the Card table
+    ]
+    # Truncate the Card table (clear out table)
     db.session.query(Card).delete()
 
     #  Add the card to the sessions (transaction)
-    db.session.add(card)
+    db.session.add_all(cards)
 
     # Commit the transaction to the database
     db.session.commit()
     print('Models seeded')
+
+@app.route('/cards')
+def all_cards():
+    # select * from cards; (stmt is statement)
+    #(db.or_(Card.status != 'Done', Card.id > 2)) - or function card status is not Done or card ID greater than 2
+    stmt = db.select(Card).order_by(Card.status.desc())
+    cards = db.session.scalars(stmt).all()
+    return cards
+    # for card in cards:
+    #     print(card.__dict__)
 
 @app.route('/')
 def index():
