@@ -61,7 +61,7 @@ def all_cards():
     #(db.or_(Card.status != 'Done', Card.id > 2)) - or function card status is not Done or card ID greater than 2
     stmt = db.select(Card).order_by(Card.status.desc())
     cards = db.session.scalars(stmt).all()
-    return cards
+    return json.dumps(cards)
     # for card in cards:
     #     print(card.__dict__)
 
