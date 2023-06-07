@@ -4,10 +4,13 @@ from datetime import date
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
+from flask_jwt_extended import JWTManager
 
 app = Flask(__name__)
 
 app.config['JSON_SORT_KEYS'] = False
+
+app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:matt@localhost:5432/trello'
 
@@ -120,7 +123,18 @@ def register():
         return UserSchema(exclude=['password']).dump(user), 201
     except IntegrityError:
         return {'error': 'Email address already in use'}, 409
-
+    
+@app.route('/login', methods=['POST'])
+def login():
+    try:
+        stmt = db.select(User).where(User.email==request.json['email'])
+        user = db.session.scalar(stmt)
+        if user and bcrypt.check_password_hash(user.password, request.json['password']):
+            return UserSchema(exclude=['password']).dump(user)
+        else:
+            return {'error': 'Invalid email address or password'}, 401
+    except KeyError:
+        return {'error': 'Email and password are required'}, 400
 
 @app.route('/cards')
 def all_cards():
