@@ -4,11 +4,9 @@ from datetime import date
 from flask_marshmallow import Marshmallow
 from flask_bcrypt import Bcrypt
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, create_access_token
 
 app = Flask(__name__)
-
-app.config['JSON_SORT_KEYS'] = False
 
 app.config['JWT_SECRET_KEY'] = 'Ministry of Silly Walks'
 
@@ -17,6 +15,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://trello_dev:matt@l
 db = SQLAlchemy(app)
 ma = Marshmallow(app)
 bcrypt = Bcrypt(app)
+jwt = JWTManager(app)
 
 class User(db.Model):
     __tablename__ = 'users'
