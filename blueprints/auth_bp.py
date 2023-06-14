@@ -8,6 +8,12 @@ from init import db, bcrypt
 
 auth_bp = Blueprint('auth', __name__)
 
+@auth_bp.route('/users')
+def all_users():
+    stmt = db.select(User)
+    users = db.session.scalars(stmt)
+    return UserSchema(many=True, exclude=['password']).dump(users)
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
     try:
@@ -35,7 +41,7 @@ def login():
         stmt = db.select(User).where(User.email==request.json['email'])
         user = db.session.scalar(stmt)
         if user and bcrypt.check_password_hash(user.password, request.json['password']):
-            token = create_access_token(identity=user.email, expires_delta=timedelta(hours=4))
+            token = create_access_token(identity=user.id, expires_delta=timedelta(hours=4))
             return {'token':token, 'user': UserSchema(exclude=['password']).dump(user)}
         else:
             return {'error': 'Invalid email address or password'}, 401
@@ -44,8 +50,8 @@ def login():
     
 
 def admin_required():
-    user_email = get_jwt_identity()
-    stmt = db.select(User).filter_by(email=user_email)
+    user_id = get_jwt_identity()
+    stmt = db.select(User).filter_by(id=user_id)
     user = db.session.scalar(stmt)
     if not (user and user.is_admin):
         abort(401)
