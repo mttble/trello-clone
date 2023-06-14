@@ -2,7 +2,7 @@ from flask import Blueprint, request, abort
 from models.card import Card, CardSchema
 from init import db
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from blueprints.auth_bp import admin_required
+from blueprints.auth_bp import admin_required, admin_or_owner_required
 from datetime import date
 
 cards_bp = Blueprint('cards', __name__, url_prefix='/cards')
@@ -57,6 +57,7 @@ def update_card(card_id):
     card = db.session.scalar(stmt)
     card_info = CardSchema().load(request.json)
     if card:
+        admin_or_owner_required(card.user.id)
         card.title = card_info.get('title', card.title)
         card.description = card_info.get('description', card.description)
         card.status = card_info.get('status', card.status)
