@@ -39,21 +39,21 @@ def seed_db():
             description="Stage 1 - Create an ERD",
             status="Done",
             date_created=date.today(),
-            user_id=users[0].id
+            user=users[0]
         ),
         Card(
             title="ORM Queries",
             description="Stage 2 - Implement several queries",
             status="In Progress",
             date_created=date.today(),
-            user_id=users[0].id
+            user=users[0]
         ),
         Card(
             title="Marshmallow",
             description="Stage 3 - Implement jsonify of models",
             status="In Progress",
             date_created=date.today(),
-            user_id=users[1].id
+            user=users[1]
         ),
     ]
 
@@ -70,20 +70,20 @@ def seed_db():
         Comment(
         message='Comment 1',
         date_created=date.today(),
-        user_id=users[0].id,
-        card_id=cards[1].id
+        user=users[0],
+        card=cards[1]
         ),
         Comment(
         message='Comment 2',
         date_created=date.today(),
-        user_id=users[1].id,
-        card_id=cards[1].id
+        user=users[1],
+        card=cards[1]
         ),
         Comment(
         message='Comment 3',
         date_created=date.today(),
-        user_id=users[1].id,
-        card_id=cards[1].id
+        user=users[1],
+        card=cards[1]
         )
     ]
     db.session.query(Comment).delete()
