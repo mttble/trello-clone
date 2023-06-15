@@ -19,8 +19,10 @@ class Card(db.Model):
 class CardSchema(ma.Schema):
   # tell marshmallow to use UserSchema to serialize the 'user' field
   user = fields.Nested('UserSchema', exclude=['password', 'cards', 'comments'])
+  # wrapped in a list because many comments
   comments = fields.List(fields.Nested('CommentSchema', exclude=['card', 'id']))
 
   class Meta:
+    # add user and comments for jsonify output in marshmallow
     fields = ('id', 'title', 'description', 'status', 'user','comments')
     ordered = True
