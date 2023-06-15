@@ -4,6 +4,7 @@ from init import db, ma, bcrypt, jwt
 from blueprints.cli_bp import cli_bp
 from blueprints.auth_bp import auth_bp
 from blueprints.cards_bp import cards_bp
+from marshmallow.exceptions import ValidationError
 
 
 # .flaskenv setup is defined
@@ -20,7 +21,11 @@ def setup():
 
     @app.errorhandler(401)
     def unauthorized(err):
-        return {'error': 'You must be an admin'}, 401
+        return {'error': str(err)}, 401
+    
+    @app.errorhandler(ValidationError)
+    def validation_error(err):
+        return {'error': err.__dict__['messages']}, 400
 
     app.register_blueprint(cli_bp)
     app.register_blueprint(auth_bp)

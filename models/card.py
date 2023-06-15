@@ -21,6 +21,8 @@ class CardSchema(ma.Schema):
   user = fields.Nested('UserSchema', exclude=['password', 'cards', 'comments'])
   # wrapped in a list because many comments
   comments = fields.List(fields.Nested('CommentSchema', exclude=['card', 'id']))
+  # validation
+  title = fields.String(required=True)
 
   class Meta:
     # add user and comments for jsonify output in marshmallow
